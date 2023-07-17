@@ -1,20 +1,24 @@
 "use client";
-import { useState } from "react";
+import { ReactEventHandler, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
+interface IApiResponse {
+  labels: string[];
+  scores: number[];
+}
 
 export default function Home() {
   const { user } = useUser();
   const [text, setText] = useState("");
-  const [predictions, setPredictions] = useState({});
+  const [predictions, setPredictions] = useState<Record<string, number>>({});
   const candidateLabels = ["technology", "humanities", "sciences", "business"];
   const [loading, setLoading] = useState(false);
   if (!user) return <div>Not logged in</div>;
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
     const data = {
@@ -33,8 +37,8 @@ export default function Home() {
       }
     );
 
-    const result = await response.json();
-    const newPredictions = {};
+    const result = (await response.json()) as IApiResponse;
+    let newPredictions: Record<string, number> = {};
     for (let i = 0; i < result.labels.length; i++) {
       newPredictions[result.labels[i]] = result.scores[i];
     }
