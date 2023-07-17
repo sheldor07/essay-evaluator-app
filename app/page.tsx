@@ -15,7 +15,7 @@ export default function Home() {
   const [text, setText] = useState("");
   const [predictions, setPredictions] = useState<Record<string, number>>({});
   const [model, setModel] = useState("");
-
+  const [error, setError] = useState("");
   const candidateLabels = ["technology", "humanities", "sciences", "business"];
   const [loading, setLoading] = useState(false);
   if (!user) return <div>Not logged in</div>;
@@ -48,12 +48,16 @@ export default function Home() {
     }
     const response = await fetch(modelURL, {
       headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_HUGGINGFACE_API_KEY}`,
+        Authorization: `Bearer hasdasdasdasd`,
       },
       method: "POST",
       body: JSON.stringify(data),
     });
-
+    if (!response.ok) {
+      setError("Something went wrong. Please try again later.");
+      setLoading(false);
+      return;
+    }
     const result = (await response.json()) as IApiResponse;
     let newPredictions: Record<string, number> = {};
     for (let i = 0; i < result.labels.length; i++) {
@@ -74,9 +78,14 @@ export default function Home() {
         </div>
         <UserButton afterSignOutUrl="/" />
       </nav>
-      <div className="grid grid-cols-2 m-12">
+      <div className="grid grid-cols-1 m-12 md:grid-cols-2">
         <div className="flex flex-col">
-          <Textarea value={text} onChange={(e) => setText(e.target.value)} />
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className={error?.length > 0 ? "border-red-500" : " "}
+          />
+          {error?.length > 0 && <p className="text-red-500">{error}</p>}
           <div className="flex flex-col w-full p-2">
             <p className="font-bold text-black text-md">Topic Classification</p>
             <Button
