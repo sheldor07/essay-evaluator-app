@@ -18,8 +18,6 @@ export default function Home() {
   const [error, setError] = useState("");
   const candidateLabels = ["technology", "humanities", "sciences", "business"];
   const [loading, setLoading] = useState(false);
-  if (!user) return <div>Not logged in</div>;
-
   const handleSubmit = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -48,12 +46,13 @@ export default function Home() {
     }
     const response = await fetch(modelURL, {
       headers: {
-        Authorization: `Bearer hasdasdasdasd`,
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_HUGGINGFACE_API_KEY}`,
       },
       method: "POST",
       body: JSON.stringify(data),
     });
     if (!response.ok) {
+      console.log(response);
       setError("Something went wrong. Please try again later.");
       setLoading(false);
       return;
@@ -67,6 +66,9 @@ export default function Home() {
     setPredictions(newPredictions);
     setLoading(false);
   };
+  async function generateKnowledgeGraph(){
+    
+  }
 
   return (
     <div className=" text-primary-foreground">
@@ -140,6 +142,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+          
         )}
       </div>
     </div>
